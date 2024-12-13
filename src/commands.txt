@@ -1,4 +1,27 @@
 git init
 git add .
 git commit -m "Initial commit"
-git checkout -b home_work_25
+git add src/commands.txt
+git add src/payment/PaymentProcessor.java
+git commit -m "add PaymentProcessor interface"
+git add src/payment/CoinAcceptor.java
+git commit -m "CoinAcceptor.java moved to Payment package and implements PaymentProcessor"
+git add src/payment/CardAcceptor.java
+git commit -m "CardAcceptor.java  was created, which implements PaymentProcessor"
+git add src/payment/CardAcceptor.java
+git commit -m "method processPayment in CardAcceptor.java  have been improved"
+git add src/AppRunner.java
+git commit -m "AppRunner.java method chooseAction have been improved and updated to use PaymentProcessor"
+git add src/AppRunner.java
+git commit -m "changePayment method added"
+git add src/AppRunner.java
+git reset --hard 42973ebf45e79387c6e75ef063eaff0cd9d887ec
+git add src/AppRunner.java
+git commit -m "Input bug fixed"
+git add -A
+git commit -m "all ready for merge"
+git checkout master
+git merge home_work_25
+git branch -d home_work_25
+git push origin master
+
