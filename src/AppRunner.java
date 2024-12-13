@@ -1,5 +1,8 @@
 import enums.ActionLetter;
 import model.*;
+import payment.CardAcceptor;
+import payment.CoinAcceptor;
+import payment.PaymentProcessor;
 import util.UniversalArray;
 import util.UniversalArrayImpl;
 
@@ -9,7 +12,10 @@ public class AppRunner {
 
     private final UniversalArray<Product> products = new UniversalArrayImpl<>();
 
-    private final CoinAcceptor coinAcceptor;
+    private PaymentProcessor paymentMethod;
+
+    private final PaymentProcessor coinAcceptor = new CoinAcceptor(0);
+    private final PaymentProcessor cardAcceptor = new CardAcceptor(0);
 
     private static boolean isExit = false;
 
@@ -22,7 +28,7 @@ public class AppRunner {
                 new Mars(ActionLetter.F, 80),
                 new Pistachios(ActionLetter.G, 130)
         });
-        coinAcceptor = new CoinAcceptor(100);
+        paymentMethod = coinAcceptor;
     }
 
     public static void run() {
@@ -36,18 +42,17 @@ public class AppRunner {
         print("В автомате доступны:");
         showProducts(products);
 
-        print("Монет на сумму: " + coinAcceptor.getAmount());
+        print("Баланс: " + paymentMethod.getBalance() + " (" + paymentMethod.getPaymentMethod() + ")");
 
         UniversalArray<Product> allowProducts = new UniversalArrayImpl<>();
         allowProducts.addAll(getAllowedProducts().toArray());
         chooseAction(allowProducts);
-
     }
 
     private UniversalArray<Product> getAllowedProducts() {
         UniversalArray<Product> allowProducts = new UniversalArrayImpl<>();
         for (int i = 0; i < products.size(); i++) {
-            if (coinAcceptor.getAmount() >= products.get(i).getPrice()) {
+            if (paymentMethod.getBalance() >= products.get(i).getPrice()) {
                 allowProducts.add(products.get(i));
             }
         }
@@ -58,30 +63,31 @@ public class AppRunner {
         print(" a - Пополнить баланс");
         showActions(products);
         print(" h - Выйти");
-        String action = fromConsole().substring(0, 1);
-        if ("a".equalsIgnoreCase(action)) {
-            coinAcceptor.setAmount(coinAcceptor.getAmount() + 10);
-            print("Вы пополнили баланс на 10");
-            return;
+        String action = fromConsole().strip();
+
+        switch (action.toLowerCase()) {
+            case "a":
+                paymentMethod.addFunds(10);
+                print("Вы пополнили баланс на 10\n");
+                return;
+            case "h":
+                isExit = true;
+                return;
         }
+
         try {
             for (int i = 0; i < products.size(); i++) {
                 if (products.get(i).getActionLetter().equals(ActionLetter.valueOf(action.toUpperCase()))) {
-                    coinAcceptor.setAmount(coinAcceptor.getAmount() - products.get(i).getPrice());
-                    print("Вы купили " + products.get(i).getName());
+                    paymentMethod.processPayment(products.get(i).getPrice());
+                    print("Вы купили " + products.get(i).getName() + "\n");
                     break;
                 }
             }
+            print("Выбрана недопустимая команда!\n");
         } catch (IllegalArgumentException e) {
-            if ("h".equalsIgnoreCase(action)) {
-                isExit = true;
-            } else {
-                print("Недопустимая буква. Попрбуйте еще раз.");
-                chooseAction(products);
-            }
+            print("Недопустимая буква. Попробуйте еще раз.\n");
+            startSimulation();
         }
-
-
     }
 
     private void showActions(UniversalArray<Product> products) {
