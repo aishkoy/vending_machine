@@ -80,14 +80,18 @@ public class AppRunner {
         }
 
         try {
+            boolean productFound = false;
             for (int i = 0; i < products.size(); i++) {
                 if (products.get(i).getActionLetter().equals(ActionLetter.valueOf(action.toUpperCase()))) {
                     paymentMethod.processPayment(products.get(i).getPrice());
                     print("Вы купили " + products.get(i).getName() + "\n");
+                    productFound = true;
                     break;
                 }
             }
-            print("Выбрана недопустимая команда!\n");
+            if (!productFound) {
+                print("Выбрана недопустимая команда!\n");
+            }
         } catch (IllegalArgumentException e) {
             print("Недопустимая буква. Попробуйте еще раз.\n");
             startSimulation();
