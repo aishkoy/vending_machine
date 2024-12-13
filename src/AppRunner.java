@@ -61,6 +61,7 @@ public class AppRunner {
 
     private void chooseAction(UniversalArray<Product> products) {
         print(" a - Пополнить баланс");
+        print(" m - Сменить способ оплаты");
         showActions(products);
         print(" h - Выйти");
         String action = fromConsole().strip();
@@ -69,6 +70,9 @@ public class AppRunner {
             case "a":
                 paymentMethod.addFunds(10);
                 print("Вы пополнили баланс на 10\n");
+                return;
+            case "m":
+                changePayment();
                 return;
             case "h":
                 isExit = true;
@@ -108,5 +112,31 @@ public class AppRunner {
 
     private void print(String msg) {
         System.out.println(msg);
+    }
+
+    private void changePayment() {
+        print("""
+                
+                Выберите тип платежной системы:
+                1. - Монетоприемник
+                2. - Банковские карты""");
+
+
+        while (true) {
+            String choice = fromConsole().strip();
+
+            switch (choice) {
+                case "1":
+                    paymentMethod = coinAcceptor;
+                    print("Выбран монетоприемник\n");
+                    return;
+                case "2":
+                    paymentMethod = cardAcceptor;
+                    print("Выбрана система оплаты картой\n");
+                    return;
+                default:
+                    System.out.print("Неверный выбор. Попробуйте снова (1 или 2):");
+            }
+        }
     }
 }
